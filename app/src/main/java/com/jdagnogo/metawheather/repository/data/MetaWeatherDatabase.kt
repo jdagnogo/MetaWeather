@@ -1,8 +1,6 @@
 package com.jdagnogo.metawheather.repository.data
 
-import android.content.ContentValues
 import android.content.Context
-import android.util.Log
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.jdagnogo.metawheather.getKnownCities

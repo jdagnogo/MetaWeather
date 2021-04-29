@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.jdagnogo.metawheather.model.City
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CityDao {

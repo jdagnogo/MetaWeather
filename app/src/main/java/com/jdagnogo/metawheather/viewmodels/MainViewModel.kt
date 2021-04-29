@@ -62,7 +62,6 @@ class MainViewModel @Inject constructor(var repository: WeatherRepository) : Vie
                 _cities.postValue(it)
             }
         }
-
     }
 
     fun isValid() = when {
