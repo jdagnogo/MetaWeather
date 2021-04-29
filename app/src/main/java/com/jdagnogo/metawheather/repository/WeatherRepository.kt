@@ -16,7 +16,10 @@ class WeatherRepository @Inject constructor(
         private val remoteData: WeatherRemoteData,
         private val cityDao: CityDao,
         private val dao: WeatherDao) {
-
+    /**
+     * An improvement could be to retrive the data from the cityDao
+     * And add an functionnality to add them in the database
+     */
     suspend fun getCities(): Flow<List<City>> = flow {
         // in the furtur we could used the cityDao in order to retrieve the data from DB
         // for now i will use the default values

@@ -9,6 +9,10 @@ import retrofit2.http.Path
  * This class will retrieved the data from the api.
  */
 interface MetaWeatherApi {
+    /**
+     * Will call the Api /api/location/
+     * Note that woeid is the unique id from the server.
+     */
     @GET(GET_LOCATION_DAY)
     suspend fun getWeather(
         @Path(value = "woeid") woeId: String,

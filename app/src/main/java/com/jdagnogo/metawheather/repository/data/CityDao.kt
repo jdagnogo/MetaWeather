@@ -7,6 +7,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.jdagnogo.metawheather.model.City
 
+/**
+ * Note that this class is not used yet. But i wanted to show the possiblity to save also the city
+ */
 @Dao
 interface CityDao {
     /**

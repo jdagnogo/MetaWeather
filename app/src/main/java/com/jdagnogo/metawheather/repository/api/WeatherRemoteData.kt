@@ -5,6 +5,10 @@ import com.jdagnogo.metawheather.model.Weather
 import java.util.*
 import javax.inject.Inject
 
+/**
+ * This class will use retrofit to call the api
+ * It will not handle the error but give it to the ViewModel
+ */
 class WeatherRemoteData  @Inject constructor(
     private val api: MetaWeatherApi) {
 

@@ -41,7 +41,7 @@ class MainViewModel @Inject constructor(var repository: WeatherRepository) : Vie
 
     /**
      * Request a snackbar to display a message.
-     * This is used to notify that we dont have internet
+     * This is used to notify that we dont have internet for example
      */
     @VisibleForTesting
     val _snackbar = MutableLiveData<Int?>()

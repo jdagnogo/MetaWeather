@@ -5,6 +5,10 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
+/**
+ * This class represent the data from the Api
+ * I did map all but only a few is used
+ */
 @Entity(tableName = "consolidate_weather")
 data class Weather(
     @PrimaryKey @field:SerializedName("id") val id: String = "",
