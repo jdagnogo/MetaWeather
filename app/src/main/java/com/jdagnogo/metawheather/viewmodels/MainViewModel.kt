@@ -88,7 +88,9 @@ class MainViewModel @Inject constructor(var repository: WeatherRepository) : Vie
             this[Calendar.MINUTE] = 0
             this[Calendar.SECOND] = 0
             this[Calendar.MILLISECOND] = 0
+            currentDate = getTime()
         }
+
     }
 
     fun getWeather() {
