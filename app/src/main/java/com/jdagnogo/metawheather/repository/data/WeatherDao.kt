@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.jdagnogo.metawheather.model.Weather
 import kotlinx.coroutines.flow.Flow
+import java.util.*
 
 @Dao
 interface WeatherDao {
@@ -14,12 +15,12 @@ interface WeatherDao {
      * Important: in case that the data have the same id, it will replace the old one
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(venues: List<Weather>)
+    suspend fun insertAll(weathers: List<Weather>)
 
     /**
      * this method will retrieve the data in the Room database
      * It will return only the data with the correct query
      */
-    @Query("SELECT * FROM consolidate_weather WHERE `location` LIKE :queryString")
-    fun getAll(queryString: String): Flow<List<Weather>>
+    @Query("SELECT * FROM consolidate_weather WHERE `location` LIKE :location AND `date` LIKE :date")
+    fun getAll(location: String, date : Date): Flow<List<Weather>>
 }

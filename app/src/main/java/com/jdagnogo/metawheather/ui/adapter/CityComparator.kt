@@ -9,7 +9,7 @@ import com.jdagnogo.metawheather.model.CityUiModel
  */
 class CityComparator : DiffUtil.ItemCallback<CityUiModel>() {
     override fun areItemsTheSame(oldItem: CityUiModel, newItem: CityUiModel): Boolean {
-        return oldItem.city.id == newItem.city.id
+        return oldItem.city.woeId == newItem.city.woeId
     }
 
     override fun areContentsTheSame(oldItem: CityUiModel, newItem: CityUiModel): Boolean {

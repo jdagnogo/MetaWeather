@@ -8,8 +8,11 @@ import androidx.lifecycle.viewModelScope
 import com.jdagnogo.metawheather.R
 import com.jdagnogo.metawheather.model.City
 import com.jdagnogo.metawheather.model.CityUiModel
+import com.jdagnogo.metawheather.model.Resource
+import com.jdagnogo.metawheather.model.Weather
 import com.jdagnogo.metawheather.repository.WeatherRepository
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
@@ -17,9 +20,13 @@ import javax.inject.Inject
 
 class MainViewModel @Inject constructor(var repository: WeatherRepository) : ViewModel() {
     @VisibleForTesting
-    var cityDetails: Job? = null
-    var currentCityWoeId: String? = null
-    var currentDate: Date? = null
+    var weatherJob: Job? = null
+    var currentCity: City = City()
+    lateinit var currentDate: Date
+
+    private val _weathers = MutableLiveData<List<Weather>?>()
+    val weathers: LiveData<List<Weather>?>
+        get() = _weathers
 
     private val _cities = MutableLiveData<List<City>?>()
     val cities: LiveData<List<City>?>
@@ -28,7 +35,7 @@ class MainViewModel @Inject constructor(var repository: WeatherRepository) : Vie
     /**
      * Show a loading spinner if true
      */
-    private val _spinner = MutableLiveData<Boolean>(false)
+    private val _spinner = MutableLiveData<Boolean>(true)
     val spinner: LiveData<Boolean>
         get() = _spinner
 
@@ -59,7 +66,7 @@ class MainViewModel @Inject constructor(var repository: WeatherRepository) : Vie
     }
 
     fun isValid() = when {
-        currentCityWoeId.isNullOrEmpty() -> {
+        currentCity.woeId.isEmpty() -> {
             _snackbar.postValue(R.string.select_city)
             false
         }
@@ -69,16 +76,80 @@ class MainViewModel @Inject constructor(var repository: WeatherRepository) : Vie
     }
 
     fun updateCitySelected(city: City): List<CityUiModel> {
-        currentCityWoeId = city.woeId
+        currentCity = city
         return cities.value?.map {
-            CityUiModel(it, it.id == city.id)
+            CityUiModel(it, it.woeId == city.woeId)
         } ?: listOf()
     }
 
     fun setDate(time: Long) {
         Calendar.getInstance().apply {
             timeInMillis = time
-            currentDate = this.time
+            this[Calendar.HOUR_OF_DAY] = 0
+            this[Calendar.MINUTE] = 0
+            this[Calendar.SECOND] = 0
+            this[Calendar.MILLISECOND] = 0
         }
+    }
+
+    fun getWeather() {
+        weatherJob?.cancel()
+        val result = repository.getWeathers(currentCity.woeId, currentDate)
+                .catch {
+                    weatherJob?.cancel()
+                }
+        weatherJob = viewModelScope.launch {
+            result.collectLatest {
+                handleResource(it)
+            }
+        }
+    }
+
+    private fun handleResource(result: Resource<List<Weather>>) {
+        when (result.status) {
+            Resource.Status.SUCCESS -> {
+                    _spinner.postValue(false)
+                    _weathers.postValue(result.data)
+                }
+            Resource.Status.LOADING -> {
+                _spinner.postValue(true)
+            }
+            else -> {
+                handleError(result.code)
+            }
+        }
+    }
+
+    /**
+     * This method will have all error cases.
+     * We will trigger the snackbar when we see the no internet error
+     * Or we will post a value in _errorMessage with the correct message
+     */
+    private fun handleError(code: String?) {
+        _spinner.postValue(false)
+        _weathers.postValue(null)
+        code?.contains(ERROR_NO_INTERNET)
+        val msg = when (code) {
+            ERROR_NO_INTERNET -> {
+                R.string.wrong_location
+            }
+            ERROR_404 -> {
+                R.string.wrong_location
+            }
+            ERROR_500 -> {
+                R.string.internal_error
+            }
+            else -> {
+                R.string.unknown_error
+            }
+        }
+        _snackbar.postValue(msg)
+    }
+
+    companion object {
+        const val ERROR_404 = "HTTP 404"
+        const val ERROR_500 = "HTTP 500"
+        const val ERROR_NO_INTERNET =
+                "Unable to resolve host \"metaweather.com\": No address associated with hostname"
     }
 }

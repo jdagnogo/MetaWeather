@@ -10,7 +10,7 @@ import retrofit2.http.Path
  */
 interface MetaWeatherApi {
     @GET(GET_LOCATION_DAY)
-    suspend fun getVenue(
+    suspend fun getWeather(
         @Path(value = "woeid") woeId: String,
         @Path(value = "year") year: String,
         @Path(value = "month") month: String,

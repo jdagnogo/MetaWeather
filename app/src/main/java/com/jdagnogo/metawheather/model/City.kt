@@ -7,7 +7,6 @@ import com.jdagnogo.metawheather.repository.data.MetaWeatherDatabase.Companion.C
 
 @Entity(tableName = CITY_TABLE)
 data class City(
-    @PrimaryKey @field:SerializedName("id") val id: String = "",
-    @field:SerializedName("woeid") val woeId: String = "",
+    @PrimaryKey @field:SerializedName("woeid") val woeId: String = "",
     @field:SerializedName("name") val name: String = ""
 )

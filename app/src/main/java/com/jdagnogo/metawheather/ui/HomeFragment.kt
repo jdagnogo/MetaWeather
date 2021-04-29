@@ -13,6 +13,8 @@ import com.jdagnogo.metawheather.model.CityUiModel
 import com.jdagnogo.metawheather.ui.adapter.CityAdapter
 import com.jdagnogo.metawheather.ui.adapter.CityListener
 import com.jdagnogo.metawheather.viewmodels.MainViewModel
+import kotlinx.android.synthetic.main.fragment_home.*
+import java.util.*
 import javax.inject.Inject
 
 class HomeFragment : BaseFragment(), CityListener {
@@ -33,8 +35,8 @@ class HomeFragment : BaseFragment(), CityListener {
     }
 
     override fun observeValues() {
-        viewModel.cities.observe(this, citiesObserver)
-        viewModel.snackbar.observe(this, snackBarObserver)
+        viewModel.cities.observe(viewLifecycleOwner, citiesObserver)
+        viewModel.snackbar.observe(viewLifecycleOwner, snackBarObserver)
     }
 
     private val citiesObserver = Observer<List<City>?> { cities ->
@@ -60,10 +62,15 @@ class HomeFragment : BaseFragment(), CityListener {
 
     override fun initViews() {
         adapter.listener = this
+        viewModel.setDate(calendarView.date)
         with(binding) {
             citiesList.adapter = adapter
+            calendarView.setOnDateChangeListener { calendarView, year, month, day ->
+                val c: Calendar = Calendar.getInstance()
+                c.set(year, month, day)
+                viewModel.currentDate = c.time
+            }
             validateButton.setOnClickListener {
-                viewModel.setDate(binding.calendarView.date)
                 if (viewModel.isValid()){
                     redirectToCityDetails()
                 }
@@ -72,9 +79,9 @@ class HomeFragment : BaseFragment(), CityListener {
     }
 
     private fun redirectToCityDetails() {
-        val fragment = childFragmentManager.findFragmentByTag(CityDetailsFragment.TAG)
+        val fragment = parentFragmentManager.findFragmentByTag(CityDetailsFragment.TAG)
                 ?: CityDetailsFragment.newInstance()
-        childFragmentManager.beginTransaction().apply {
+        parentFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_container, fragment, CityDetailsFragment.TAG)
             addToBackStack(null)
             commit()

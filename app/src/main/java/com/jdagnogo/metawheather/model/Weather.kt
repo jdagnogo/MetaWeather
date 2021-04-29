@@ -9,9 +9,9 @@ import java.util.*
 data class Weather(
     @PrimaryKey @field:SerializedName("id") val id: String = "",
     @field:SerializedName("weather_state_name") val stateName: String = "",
-    @field:SerializedName("weather_state_abbr") val stateAbbe: String = "",
-    @field:SerializedName("location") val location: String = "",
-    @field:SerializedName("data") val date: Date = Calendar.getInstance().time,
+    @field:SerializedName("weather_state_abbr") val stateAbbr: String = "",
+    @field:SerializedName("location") var location: String = "",
+    @field:SerializedName("data") var date: Date = Calendar.getInstance().time,
     @field:SerializedName("wind_direction_compass") val directionCompass: String = "",
     @field:SerializedName("min_temp") val minTemp: Float = 0f,
     @field:SerializedName("max_temp") val maxTemp: Float = 0f,

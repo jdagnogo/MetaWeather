@@ -1,6 +1,7 @@
 package com.jdagnogo.metawheather.repository
 
 import com.jdagnogo.metawheather.model.Resource
+import com.jdagnogo.metawheather.model.Weather
 import kotlinx.coroutines.flow.*
 
 /**
@@ -19,7 +20,10 @@ fun <T, A> resourceAsFlow(
 ) = flow {
     emit(Resource.loading(null))
     // we push values we have in database
-    emit(fetchFromLocal().map { Resource.success<T>(it) }.first())
+    val result = fetchFromLocal().map { Resource.success<T>(it) }.first().apply { emit(this) }
+    val weather = result.data as? List<*>
+    if (weather?.isNotEmpty() == true) return@flow
+
     // then we ask the server for more refresh values
     val responseStatus = networkCall.invoke()
     if (responseStatus.status == Resource.Status.SUCCESS) {

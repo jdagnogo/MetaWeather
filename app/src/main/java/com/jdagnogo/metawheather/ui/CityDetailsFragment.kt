@@ -1,30 +1,65 @@
 package com.jdagnogo.metawheather.ui
 
 import android.view.View
+import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.jdagnogo.metawheather.databinding.FragmentCityBinding
+import com.jdagnogo.metawheather.model.Weather
+import com.jdagnogo.metawheather.ui.adapter.WeatherAdapter
+import com.jdagnogo.metawheather.viewmodels.MainViewModel
+import javax.inject.Inject
 
-class CityDetailsFragment :BaseFragment(){
+class CityDetailsFragment : BaseFragment() {
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    @VisibleForTesting
+    lateinit var viewModel: MainViewModel
+
+    @Inject
+    lateinit var adapter: WeatherAdapter
+    private lateinit var binding: FragmentCityBinding
+
     override fun subscribeViewModel() {
-        TODO("Not yet implemented")
+        viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get(MainViewModel::class.java)
     }
 
     override fun observeValues() {
-        TODO("Not yet implemented")
+        viewModel.weathers.observe(viewLifecycleOwner, weathersObserver)
+        viewModel.spinner.observe(this, spinnerObserver)
     }
 
+    private val weathersObserver = Observer<List<Weather>?> { weathers ->
+        adapter.submitList(weathers)
+    }
+
+    private val spinnerObserver = Observer<Boolean> { boolean ->
+        binding.progressCircular.visibility = View.VISIBLE.takeIf { boolean } ?: View.GONE
+    }
+
+
     override fun setSupportInjection(): Fragment {
-        TODO("Not yet implemented")
+        return this
     }
 
     override fun initViewBiding(): View {
-        TODO("Not yet implemented")
+        binding = FragmentCityBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun initViews() {
-        TODO("Not yet implemented")
+        with(binding) {
+            weatherList.adapter = adapter
+            cityName.text = viewModel.currentCity.name
+            icBack.setOnClickListener {
+                parentFragmentManager.popBackStack()
+            }
+        }
+        viewModel.getWeather()
     }
-
 
     companion object {
         fun newInstance() = CityDetailsFragment().apply {

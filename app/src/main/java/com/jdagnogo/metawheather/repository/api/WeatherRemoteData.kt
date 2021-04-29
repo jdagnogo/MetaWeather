@@ -1,7 +1,27 @@
 package com.jdagnogo.metawheather.repository.api
 
+import com.jdagnogo.metawheather.model.Resource
+import com.jdagnogo.metawheather.model.Weather
+import java.util.*
 import javax.inject.Inject
 
 class WeatherRemoteData  @Inject constructor(
     private val api: MetaWeatherApi) {
+
+    suspend fun fetchData(woeId: String, date: Date): Resource<List<Weather>> {
+        return try {
+            val cal = Calendar.getInstance().apply { time = date }
+            val result = api.getWeather(
+                    woeId,
+                    cal.get(Calendar.YEAR).toString(),
+                    cal.get(Calendar.MONTH).toString(),
+                    cal.get(Calendar.DAY_OF_MONTH).toString())
+            result.forEach {
+                it.date = date
+                it.location = woeId }
+            Resource.success(result)
+        } catch (e: Exception) {
+            Resource.error(e.message ?: "", emptyList())
+        }
+    }
 }
